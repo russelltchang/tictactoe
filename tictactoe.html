@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">  
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> <!--This needs to be above jQuery-->
+<script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+<style>
+    .jumbotron {
+        background-color: tan;
+        margin-top: 50px;
+    }
+
+    table {
+        margin:0px auto;
+    }    
+    
+    td {
+        border: 2px solid #222;
+        background: white;
+        text-align: center;
+        height: 100px;
+        width: 100px;
+        cursor: pointer;
+        font-size: 400%;
+    }
+    
+    td:first-of-type {
+        border-left-color: transparent;
+        border-top-color: transparent;
+    }
+    
+    td:nth-of-type(2) {
+        border-top-color: transparent;
+    }
+    
+    td:nth-of-type(3) {
+        border-right-color: transparent;
+        border-top-color: transparent;
+    }
+    
+    tr:nth-of-type(3) td {
+        border-bottom-color: transparent;
+    }
+    
+    .buttons {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    
+    .endgame {
+        text-align: center;
+        font-family: monospace;
+        margin-top: 10px;
+        font-size: 200%;
+    }
+    
+</style>
+    
+<script>
+const winCombos = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [6, 4, 2]
+];
+    
+let board;
+let huPlayer;
+let aiPlayer;
+    
+function chooseXO(id) {
+    $("#X, #O").hide();
+    if (id === "X") {
+        huPlayer = "X";
+        aiPlayer = "O";
+        startGame();
+    } else {
+        huPlayer = "O";
+        aiPlayer = "X";
+        startGame();
+    }
+}    
+        
+function startGame() {
+    board = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    for (i=0; i<document.querySelectorAll('.cell').length; i++) {
+        document.querySelectorAll('.cell')[i].innerHTML = "";
+        document.querySelectorAll('.cell')[i].addEventListener('click', turnClick);
+    }
+}
+    
+function turnClick() {
+    if (typeof board[event.target.id] === "number") {
+        board[event.target.id] = huPlayer;
+        document.getElementById(event.target.id).innerHTML = huPlayer; 
+        if (checkWin(huPlayer)) {
+            document.getElementsByClassName("text")[0].innerHTML = "You won!";
+            for (i=0; i<document.querySelectorAll('.cell').length; i++) {
+                document.querySelectorAll('.cell')[i].removeEventListener('click', turnClick);
+            }
+        } else {
+            let squaresLeft = board.filter(function(element) {
+                return typeof element === "number";
+            });
+            let randomSquare = squaresLeft[Math.floor(Math.random()* (squaresLeft.length))];       
+            board[randomSquare] = aiPlayer;
+            document.getElementById(randomSquare).innerHTML = aiPlayer;
+            if (checkWin(aiPlayer)) {
+                document.getElementsByClassName("text")[0].innerHTML = "You lost!";
+                for (i=0; i<document.querySelectorAll('.cell').length; i++) {
+                    document.querySelectorAll('.cell')[i].removeEventListener('click', turnClick);
+                }
+            }
+        }
+    }
+}
+
+function checkWin(player) {
+    var gameOver = winCombos.filter(function(array) {
+        return board[array[0]] === player && board[array[1]] === player && board[array[2]] === player;
+    });
+    if (gameOver.length > 0) {
+        return true;
+    }
+    return false;
+}
+    
+</script>  
+</head>
+
+<body>	
+  <div class="container-fluid">
+    <div class="jumbotron col-lg-6 offset-lg-3">
+      <div class="buttons">
+        <button class="btn btn-primary" id="X" onclick="chooseXO(this.id)">Play as X</button>
+        <button class="btn btn-primary" id="O" onclick="chooseXO(this.id)">Play as O</button>
+        <button class="btn btn-danger reset" onclick ="window.location.reload()">Reset</button>
+      </div>
+      <table id="board">   
+        <tr>
+          <td class="cell" id="0"></td>
+          <td class="cell" id="1"></td>
+          <td class="cell" id="2"></td>
+        </tr>
+        <tr>
+          <td class="cell" id="3"></td>
+          <td class="cell" id="4"></td>
+          <td class="cell" id="5"></td>
+        </tr>
+        <tr>
+          <td class="cell" id="6"></td>
+          <td class="cell" id="7"></td>
+          <td class="cell" id="8"></td>
+        </tr>
+      </table>
+      <div class="endgame">
+        <div class="text"></div>    
+      </div>
+    </div>
+  </div>
+</body>
+</html>
